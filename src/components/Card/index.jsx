@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types'
-import { useState } from 'react'
 import DefaultPicture from '../../assets/profile.png'
 import styled from 'styled-components'
 import colors from '../../utils/style/colors'
-import { useTheme } from '../../utils/hooks'
+import { Component } from 'react'
 
 const CardLabel = styled.span`
     color: #5843e4;
@@ -41,21 +40,25 @@ const CardWrapper = styled.div`
         box-shadow: 2px 2px 10px #e2e3e9;
     }
 `
+class Card extends Component {
+    constructor (props) {
+        super(props)
+        this.state = {
+            isFavorite: false,
+        }
+    }
 
-function Card({ label, title, picture }) {
-    const { theme } = useTheme()
-    const [isFavorite, setIsFavorite] = useState(false)
-    const star = isFavorite ? '⭐️' : ''
+    render() {
+        const { theme, picture, label, title } = this.props
 
-    return (
-        <CardWrapper theme={theme} onClick={() => setIsFavorite(!isFavorite)}>
-            <CardLabel theme={theme}>{label}</CardLabel>
-            <CardImage src={picture} alt="freelance" />
-            <CardTitle theme={theme}>
-                {star} {title} {star}
-            </CardTitle>
-        </CardWrapper>
-    )
+        return (
+            <CardWrapper theme={theme} onClick={this.setFavorite}>
+                <CardLabel theme={theme}>{label}</CardLabel>
+                <CardImage src={picture} alt="freelance" />
+                <CardTitle theme={theme}>{title}</CardTitle>
+            </CardWrapper>
+        )
+    }
 }
 
 Card.propTypes = {

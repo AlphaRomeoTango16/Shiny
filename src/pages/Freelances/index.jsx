@@ -1,25 +1,9 @@
 import Card from '../../components/Card/index'
-import DefaultPicture from '../../assets/profile.png'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import colors from '../../utils/style/colors'
-
-const freelanceProfiles = [
-    {
-        name: 'Jane Doe',
-        jobTitle: 'Devops',
-        picture: DefaultPicture,
-    },
-    {
-        name: 'John Doe',
-        jobTitle: 'Developpeur frontend',
-        picture: DefaultPicture,
-    },
-    {
-        name: 'Jeanne Biche',
-        jobTitle: 'Développeuse Fullstack',
-        picture: DefaultPicture,
-    },
-]
+import { Loader } from '../../utils/style/Atoms'
+import { useFetch, useTheme } from '../../utils/hooks'
 
 const CardsContainer = styled.div`
     display: grid;
@@ -35,6 +19,7 @@ const PageTitle = styled.h1`
     color: black;
     text-align: center;
     padding-bottom: 30px;
+    color: ${({ theme }) => (theme === 'light' ? '#000000' : '#ffffff')};
 `
 
 const PageSubtitle = styled.h2`
@@ -43,24 +28,49 @@ const PageSubtitle = styled.h2`
     font-weight: 300;
     text-align: center;
     padding-bottom: 30px
+    color: ${({ theme }) => (theme === 'light' ? '#000000' : '#ffffff')};
+`
+
+const LoaderWrapper = styled.div`
+    display: flex;
+    justify-content: center
 `
 
 function Freelances() {
+    const { theme } = useTheme()
+    const { data, isLoading, error } = useFetch(
+        `http://localhost:8000/freelances`
+    )
+
+    const freelancersList = data?.freelancersList
+
+    if (error) {
+        return <span>Il y a un problème</span>
+    }
+
     return (
         <div>
-           <PageTitle>Trouvez votre prestataire</PageTitle>
-           <PageSubtitle>Chez Shiny nous réunissons les meilleurs profils pour vous.
+           <PageTitle theme={theme}>Trouvez votre prestataire</PageTitle>
+           <PageSubtitle theme={theme}>Chez Shiny nous réunissons les meilleurs profils pour vous.
            </PageSubtitle>
+           {isLoading ? (
+               <LoaderWrapper>
+                   <Loader theme={theme} data-testid="loader" />
+               </LoaderWrapper>
+           ) : (
             <CardsContainer>
-            {freelanceProfiles.map((profile, index) => (
-                <Card 
-                    key={`${profile.name}-${index}`}
-                    label={profile.jobTitle}
-                    picture={profile.picture}
-                    title={profile.name}
-                />
+            {freelancersList?.map((profile) => (
+                <Link key={`freelance-${profile.id}`} to={`/profile/${profile.id}`}>
+                    <Card 
+                        label={profile.jobTitle}
+                        picture={profile.picture}
+                        title={profile.name}
+                        theme={theme}
+                    />
+                </Link>
             ))}
             </CardsContainer>
+           )}
         </div>
     )
 }
